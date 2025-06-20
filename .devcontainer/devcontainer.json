@@ -1,0 +1,43 @@
+{
+  "name": "NarrateAI Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter",
+        "ms-python.pylint",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.formatting.provider": "black",
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/static/audio/generated/*.mp3": true
+        }
+      }
+    }
+  },
+  "postCreateCommand": "pip install -r requirements-dev.txt && mkdir -p static/audio/generated",
+  "remoteEnv": {
+    "FLASK_ENV": "development",
+    "FLASK_DEBUG": "1"
+  },
+  "forwardPorts": [5000],
+  "portsAttributes": {
+    "5000": {
+      "label": "NarrateAI Flask App",
+      "onAutoForward": "notify"
+    }
+  }
+}

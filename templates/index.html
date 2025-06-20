@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="story-creator">
+    <div class="input-section">
+        <div class="input-group">
+            <label for="keywords">
+                <i class="fas fa-tags"></i> Story Keywords
+            </label>
+            <input type="text" id="keywords" placeholder="Enter keywords separated by commas (e.g., dragon, castle, friendship)">
+            <small class="help-text">Enter 1-10 keywords that will be included in your story</small>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="theme">
+                    <i class="fas fa-palette"></i> Theme
+                </label>
+                <select id="theme">
+                    <option value="adventure">Adventure</option>
+                    <option value="mystery">Mystery</option>
+                    <option value="romance">Romance</option>
+                    <option value="fantasy">Fantasy</option>
+                    <option value="comedy">Comedy</option>
+                    <option value="horror">Horror</option>
+                    <option value="children">Children's Story</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="duration">
+                    <i class="fas fa-clock"></i> Story Duration
+                </label>
+                <select id="duration">
+                    <option value="1">1 Minute (~150 words)</option>
+                    <option value="3" selected>3 Minutes (~450 words)</option>
+                    <option value="5">5 Minutes (~750 words)</option>
+                    <option value="10">10 Minutes (~1500 words)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="moods">
+                <i class="fas fa-heart"></i> Emotional Moods (Select multiple)
+            </label>
+            <div class="mood-selector">
+                <div class="mood-options">
+                    <label class="mood-option">
+                        <input type="checkbox" value="excitement" name="moods">
+                        <span class="mood-tag excitement">Excitement</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="joy" name="moods">
+                        <span class="mood-tag joy">Joy</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="sadness" name="moods">
+                        <span class="mood-tag sadness">Sadness</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="anger" name="moods">
+                        <span class="mood-tag anger">Anger</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="fear" name="moods">
+                        <span class="mood-tag fear">Fear</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="surprise" name="moods">
+                        <span class="mood-tag surprise">Surprise</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="calm" name="moods" checked>
+                        <span class="mood-tag calm">Calm</span>
+                    </label>
+                    <label class="mood-option">
+                        <input type="checkbox" value="mysterious" name="moods">
+                        <span class="mood-tag mysterious">Mysterious</span>
+                    </label>
+                </div>
+            </div>
+            <small class="help-text">Select the emotional tones you want in your story</small>
+        </div>
+
+        <button id="generateBtn" class="generate-btn">
+            <i class="fas fa-magic"></i> Create My Story
+        </button>
+    </div>
+
+    <div class="output-section" id="outputSection" style="display: none;">
+        <div class="story-info">
+            <h3><i class="fas fa-book"></i> Your Story</h3>
+            <div class="story-meta">
+                <span id="durationInfo" class="meta-tag"></span>
+                <span id="emotionsInfo" class="meta-tag"></span>
+                <span id="wordCountInfo" class="meta-tag"></span>
+            </div>
+        </div>
+
+        <div class="story-text" id="storyText"></div>
+
+        <div class="audio-player">
+            <h4><i class="fas fa-volume-up"></i> Listen to Your Story</h4>
+            <audio id="storyAudio" controls preload="metadata">
+                Your browser does not support the audio element.
+            </audio>
+            <div class="audio-controls">
+                <button id="downloadBtn" class="download-btn">
+                    <i class="fas fa-download"></i> Download Audio
+                </button>
+                <button id="regenerateBtn" class="regenerate-btn">
+                    <i class="fas fa-redo"></i> Generate New Story
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loadingSection" style="display: none;">
+        <div class="spinner"></div>
+        <p>Creating your emotional story...</p>
+        <div class="loading-steps">
+            <div class="step" id="step1">
+                <i class="fas fa-pen"></i> Generating story content...
+            </div>
+            <div class="step" id="step2">
+                <i class="fas fa-heart"></i> Analyzing emotions...
+            </div>
+            <div class="step" id="step3">
+                <i class="fas fa-microphone"></i> Creating emotional audio...
+            </div>
+        </div>
+    </div>
+
+    <div class="error-message" id="errorMessage" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="errorText"></span>
+        <button id="dismissError" class="dismiss-btn">&times;</button>
+    </div>
+</div>
+{% endblock %}
