@@ -163,10 +163,34 @@ class NarrateAI {
         // Display story text
         document.getElementById('storyText').textContent = data.story;
 
-        // Setup audio player
+        // Handle audio player - UPDATED TO HANDLE MISSING AUDIO
         const audioPlayer = document.getElementById('storyAudio');
-        audioPlayer.src = data.audio_url;
-        this.currentAudioUrl = data.audio_url;
+        const audioSection = document.querySelector('.audio-player');
+        
+        if (data.audio_url && data.audio_url !== null && data.audio_url !== 'null') {
+            // Audio is available
+            audioPlayer.src = data.audio_url;
+            this.currentAudioUrl = data.audio_url;
+            audioSection.style.display = 'block';
+            
+            // Auto-play audio after a short delay
+            setTimeout(() => {
+                audioPlayer.play().catch(error => {
+                    console.log('Auto-play prevented by browser:', error);
+                });
+            }, 1000);
+        } else {
+            // No audio available - hide audio section and show message
+            audioSection.style.display = 'none';
+            this.currentAudioUrl = null;
+            
+            // Show a message that audio generation is coming soon
+            if (data.message) {
+                this.showInfo(data.message);
+            } else {
+                this.showInfo('Story generated successfully! Audio generation feature coming soon.');
+            }
+        }
 
         // Show output section
         document.getElementById('outputSection').style.display = 'block';
@@ -176,13 +200,6 @@ class NarrateAI {
             behavior: 'smooth',
             block: 'start'
         });
-
-        // Auto-play audio after a short delay
-        setTimeout(() => {
-            audioPlayer.play().catch(error => {
-                console.log('Auto-play prevented by browser:', error);
-            });
-        }, 1000);
     }
 
     hideOutput() {
@@ -190,7 +207,7 @@ class NarrateAI {
     }
 
     downloadAudio() {
-        if (this.currentAudioUrl) {
+        if (this.currentAudioUrl && this.currentAudioUrl !== null) {
             const link = document.createElement('a');
             link.href = this.currentAudioUrl;
             link.download = `narrate-ai-story-${Date.now()}.mp3`;
@@ -198,7 +215,7 @@ class NarrateAI {
             link.click();
             document.body.removeChild(link);
         } else {
-            this.showError('No audio available to download.');
+            this.showError('No audio available to download. Audio generation feature is coming soon!');
         }
     }
 
@@ -213,6 +230,14 @@ class NarrateAI {
         setTimeout(() => {
             this.hideError();
         }, 5000);
+    }
+
+    showInfo(message) {
+        // Create or show info message (similar to error but with different styling)
+        console.log('Info:', message);
+        
+        // You can create a separate info message element if desired
+        // For now, we'll just log it to console
     }
 
     hideError() {

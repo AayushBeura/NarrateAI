@@ -10,9 +10,10 @@ class StoryGenerator:
             raise ValueError("GEMINI_API_KEY environment variable not set")
         
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        # Use the current Gemini model instead of deprecated gemini-pro
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
         
-        # Word count estimates for different durations (reading speed ~150 words/minute)
+        # Word count estimates for different durations
         self.duration_word_counts = {
             1: 150,   # 1 minute
             3: 450,   # 3 minutes
@@ -20,7 +21,7 @@ class StoryGenerator:
             10: 1500  # 10 minutes
         }
         
-        logging.info("Story Generator initialized successfully")
+        logging.info("Story Generator initialized successfully with gemini-1.5-flash")
     
     def create_story(self, keywords: List[str], theme: str, target_duration: int, preferred_moods: List[str]) -> str:
         """Generate a story based on input parameters"""

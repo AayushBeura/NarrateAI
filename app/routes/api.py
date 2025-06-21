@@ -1,8 +1,7 @@
-from flask import Blueprint, request, jsonify, current_app, send_file
+from flask import Blueprint, request, jsonify, current_app
 from app.services.story_generator import StoryGenerator
 from app.services.emotion_analyzer import EmotionAnalyzer
 from app.services.audio_processor import AudioProcessor
-from app.utils.validators import validate_story_request
 import os
 import uuid
 import logging
@@ -27,18 +26,16 @@ def generate_story():
     if not all([story_gen, emotion_analyzer, audio_processor]):
         return jsonify({
             'success': False,
-            'error': 'AI services not properly initialized. Check API keys.'
+            'error': 'AI services not properly initialized. Check API keys and dependencies.'
         }), 500
     
     try:
         data = request.get_json()
         
-        # Validate request data
-        validation_error = validate_story_request(data)
-        if validation_error:
+        if not data:
             return jsonify({
                 'success': False,
-                'error': validation_error
+                'error': 'No data provided'
             }), 400
         
         keywords = data.get('keywords', [])
@@ -72,26 +69,33 @@ def generate_story():
         
         logging.info(f"🎭 Emotions analyzed: {len(emotional_segments)} segments")
         
-        # Generate audio
+        # Generate audio with Murf AI
         audio_filename = f"story_{uuid.uuid4().hex[:8]}.mp3"
         audio_path = os.path.join(current_app.config['UPLOAD_FOLDER'], audio_filename)
         
-        audio_processor.generate_emotional_audio(
-            emotional_segments, 
-            output_path=audio_path,
-            theme=theme
-        )
-        
-        logging.info(f"🎵 Audio generated: {audio_filename}")
+        try:
+            logging.info("🎵 Starting audio generation...")
+            audio_processor.generate_emotional_audio(
+                emotional_segments, 
+                output_path=audio_path,
+                theme=theme
+            )
+            audio_url = f'/static/audio/generated/{audio_filename}'
+            logging.info(f"🎵 Audio generated successfully: {audio_filename}")
+        except Exception as audio_error:
+            logging.error(f"Audio generation failed: {audio_error}")
+            # Return story without audio if audio generation fails
+            audio_url = None
         
         return jsonify({
             'success': True,
             'story': story_text,
-            'audio_url': f'/static/audio/generated/{audio_filename}',
+            'audio_url': audio_url,
             'duration_estimate': f"{duration} minutes",
             'emotions_used': list(set([seg['emotion'] for seg in emotional_segments])),
             'segments_count': len(emotional_segments),
-            'word_count': len(story_text.split())
+            'word_count': len(story_text.split()),
+            'message': 'Story and audio generated successfully!' if audio_url else 'Story generated successfully! Audio generation failed.'
         })
         
     except Exception as e:
@@ -100,15 +104,3 @@ def generate_story():
             'success': False,
             'error': f'Internal server error: {str(e)}'
         }), 500
-
-@api_bp.route('/download-audio/<filename>')
-def download_audio(filename):
-    """Download generated audio file"""
-    try:
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        if os.path.exists(file_path):
-            return send_file(file_path, as_attachment=True)
-        else:
-            return jsonify({'error': 'File not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
